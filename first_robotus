@@ -1,0 +1,46 @@
+#define dirR 7
+#define dirL 8
+#define pwmR 9
+#define pwmL 10
+#define speed 128
+
+void stop(){
+  analogWrite(pwmR, 0); // скорость на 0 на правом колесе
+  analogWrite(pwmL, 0); // скорость на 0 на левом колесе
+}
+void setSpeed(int spd){  // плавное изменение скорости
+  for (byte i=30; i<spd; i++){
+    analogWrite(pwmR, i);
+    analogWrite(pwmL, i);
+    delay(2);
+  }
+}
+void moveForward(int time){ // езда вперед с плавным ускорением
+  digitalWrite(dirR, HIGH);
+  digitalWrite(dirL, LOW);
+  setSpeed(speed);
+  delay(time);
+  stop();
+}
+void moveRotate90(){
+  digitalWrite(dirL, HIGH);
+  digitalWrite(dirR, HIGH);
+  analogWrite(pwmR, speed);
+  analogWrite(pwmL, speed);
+  stop();
+}
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(dirR, OUTPUT);
+  pinMode(dirL, OUTPUT);
+  pinMode(pwmR, OUTPUT);
+  pinMode(pwmL, OUTPUT);
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  moveForward(1000);
+  moveRotate90();
+
+}
