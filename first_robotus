@@ -5,17 +5,17 @@
 #define speed 128
 
 void stop(){
-  analogWrite(pwmR, 0); // скорость на 0 на правом колесе
-  analogWrite(pwmL, 0); // скорость на 0 на левом колесе
+  analogWrite(pwmR, 0); // right wheel - speed 0
+  analogWrite(pwmL, 0); // left wheel - speed 0
 }
-void setSpeed(int spd){  // плавное изменение скорости
+void setSpeed(int spd){  // set speed smoothly
   for (byte i=30; i<spd; i++){
     analogWrite(pwmR, i);
     analogWrite(pwmL, i);
     delay(2);
   }
 }
-void moveForward(int time){ // езда вперед с плавным ускорением
+void moveForward(int time){ // move forward with smoothly acceleration
   digitalWrite(dirR, HIGH);
   digitalWrite(dirL, LOW);
   setSpeed(speed);
@@ -30,7 +30,6 @@ void moveRotate90(){
   stop();
 }
 void setup() {
-  // put your setup code here, to run once:
   pinMode(dirR, OUTPUT);
   pinMode(dirL, OUTPUT);
   pinMode(pwmR, OUTPUT);
@@ -39,7 +38,6 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   moveForward(1000);
   moveRotate90();
 }
