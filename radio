@@ -1,0 +1,57 @@
+#define green 2
+#define blue 3
+#define red 4
+#define TR_pin A0
+#define E_pin A1
+
+void alarm(float);
+void radio(){
+  digitalWrite(TR_pin, 0);
+  delayMicroseconds(1);
+  digitalWrite(TR_pin, 1);
+  delayMicroseconds(10);
+  digitalWrite(TR_pin, 0);
+  while(!digitalRead(E_pin));
+//    Serial.println("Wait start...");
+  long int time_start = micros();
+  while(digitalRead(E_pin));
+//    Serial.println("Wait end...");
+  long int time_finish = micros();
+  float s = (float)(time_finish - time_start)/10000 * 170;
+  Serial.println(s);
+  delay(10);
+  alarm(s);
+}
+void alarm(float s){
+
+  digitalWrite(red,LOW);
+  digitalWrite(blue,LOW);
+  digitalWrite(green,LOW);
+  
+  if (s < 5){
+    digitalWrite(red, HIGH);
+  }
+  else if (s >= 5 && s < 10){
+    digitalWrite(blue, HIGH);
+  }
+  else {
+    digitalWrite(green, HIGH);
+  }
+
+  
+}
+
+
+void setup() {
+  // put your setup code here, to run once:
+   pinMode(red, OUTPUT);
+   pinMode(green,OUTPUT);
+   pinMode(blue,OUTPUT);
+   pinMode(TR_pin,OUTPUT);
+   pinMode(E_pin,INPUT);
+   Serial.begin(9600);
+}
+
+void loop() {
+ radio();
+}
