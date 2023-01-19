@@ -17,7 +17,7 @@ void radio(){
   while(digitalRead(E_pin));
 //    Serial.println("Wait end...");
   long int time_finish = micros();
-  float s = (float)(time_finish - time_start)/10000 * 170;
+  float s = (float)(time_finish - time_start)/10000 * 170;     /sm
   Serial.println(s);
   delay(10);
   alarm(s);
