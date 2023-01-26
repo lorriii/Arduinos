@@ -1,0 +1,93 @@
+#define pwmR 3
+#define dirR 12
+#define brakeR 9
+
+#define pwmL 11
+#define dirL 13
+#define brakeL 8
+
+#define TR_pin A1
+#define E_pin A0
+
+int dist = 0;
+float kp = 1.9;
+
+void move(int spd){
+  if (spd == 0){
+    delay(5000);
+  }
+  if (spd > 0){
+    //spd *= -1;
+    digitalWrite(dirL, HIGH);
+    digitalWrite(dirR, HIGH);
+    for (int i=0; i<=spd; i+=2){
+      analogWrite(pwmL, i);
+      analogWrite(pwmR, i);
+      delay(30);
+    }
+  }
+  else{
+    digitalWrite(dirL, LOW);
+    digitalWrite(dirR, LOW);
+    spd = abs(spd);
+    for (int i=0; i<=spd; i+=2){
+      analogWrite(pwmL, i);
+      analogWrite(pwmR, i);
+      delay(30);
+    }
+  }
+  //delay(200);
+//  analogWrite(pwmL, 0);
+//  analogWrite(pwmR, 0);
+  delay(300);
+}
+
+void radio(){
+  digitalWrite(TR_pin, 0);
+  delayMicroseconds(1);
+  
+  digitalWrite(TR_pin, 1);
+  delayMicroseconds(10);
+  digitalWrite(TR_pin, 0);
+  while(!digitalRead(E_pin));
+//    Serial.println("Wait start...");
+  long int time_start = micros();
+  while(digitalRead(E_pin));
+//    Serial.println("Wait end...");
+  long int time_finish = micros();
+  dist = (float)(time_finish - time_start)/10000 * 170;
+  Serial.println(dist);
+  //delay(1000);
+}
+
+void p_reg(int finish_dist){
+  int error = dist - finish_dist;
+  //if (er > 0)  вперед
+  //if (er < 0)  назад
+  //move(error * kp);
+  Serial.println("error: ");
+  Serial.println(error * kp);
+  if (error < 0) error *= 1.2;
+  move((int)(error * kp));
+}
+
+void setup() {
+  Serial.begin(9600);
+  
+  pinMode(pwmR, OUTPUT);
+  pinMode(dirR, OUTPUT);
+  pinMode(brakeR, OUTPUT);
+  
+  pinMode(pwmL, OUTPUT);
+  pinMode(dirL, OUTPUT);
+  pinMode(brakeL, OUTPUT);
+
+  pinMode(TR_pin,OUTPUT);
+  pinMode(E_pin,INPUT);
+}
+
+void loop() {
+  radio();
+  p_reg(50);
+  //move(-255);
+}
