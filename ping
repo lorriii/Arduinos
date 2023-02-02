@@ -1,0 +1,41 @@
+#include <NewPing.h>
+#define Rspeed 3
+#define Rdir 12
+#define Lspeed 11
+#define Ldir 13
+
+NewPing sonar(A1, A0);
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  pinMode(Rspeed, OUTPUT);
+  pinMode(Rdir, OUTPUT);
+  pinMode(Lspeed, OUTPUT);
+  pinMode(Ldir, OUTPUT);
+
+  digitalWrite(Rdir, HIGH);
+  digitalWrite(Ldir, HIGH);
+
+  //analogWrite(Rspeed, 100);
+  //analogWrite(Lspeed, 100);
+
+}
+
+long int my_time = millis();
+long int last_time = millis();
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  //Serial.println(last_time - my_time);
+  if (my_time - last_time >= 40){
+    Serial.println(sonar.ping_cm());
+    last_time = millis();
+  }
+  //delay(500);
+
+  my_time = millis();
+  
+
+
+}
