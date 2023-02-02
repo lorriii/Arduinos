@@ -35,7 +35,4 @@ void loop() {
   //delay(500);
 
   my_time = millis();
-  
-
-
 }
