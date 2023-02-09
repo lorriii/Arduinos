@@ -1,0 +1,69 @@
+#include <Wire.h>      //библиотека для работы с датчиком линии, в <> потому что она расположена в строенной библиоткеке ардуино
+
+#define RIGHT_PWM 3     //скорость на правом колесе
+#define RIGHT_DIR 12    //направление на правом колесе
+#define LEFT_PWM 11    
+#define LEFT_DIR 13
+#define SPEED 50
+#define P_COOF 0.1     //п-регулятор
+
+byte raw_line[11] = {};        //заполнить массив нулями (8 байт - 8 датчиков линии, 3 байта на датчик цвета RGB)
+byte line[8];                  //линия без дачика цвета
+const int8_t line_weight[8] = {-8, -4, -2, -1, 1, 2, 4, 8};    //Веса для датчиков линии, int8_t, т.к. byte - unsigned
+int error;                    //ошибка
+
+void motor_setup(){
+  pinMode(RIGHT_PWM, OUTPUT);
+  pinMode(RIGHT_DIR, OUTPUT);
+  pinMode(LEFT_PWM, OUTPUT);
+  pinMode(LEFT_DIR, OUTPUT);
+  
+  digitalWrite(RIGHT_DIR, HIGH);       //напарвление вперед правого колеса
+  digitalWrite(RIGHT_DIR, LOW);
+  //analogWrite(RIGHT_PWM, 100);         //скорость на правом колесе
+  //analogWrite(RIGHT_PWM, 100); 
+}
+void steering_drive(){               //берет ошибку и подает на моторы
+  error *= P_COOF;                   //делаем вклад ошибки по-меньше
+  if (error > 0){
+    analogWrite(LEFT_PWM, SPEED);   
+    analogWrite(RIGHT_PWM, constrain(SPEED + error, 0, SPEED));         // замедляет колесо, чтобы повернуть. Также не дает стать скорости меньше нуля или больше speed
+  }
+  else if (error < 0){
+    analogWrite(LEFT_PWM, constrain(SPEED + error, 0, SPEED));           //плюс, т.к. error < 0
+    analogWrite(RIGHT_PWM, SPEED);
+  }
+}
+
+void setup() {
+  Wire.begin();
+  Serial.begin(115200);
+  motor_setup();
+}
+
+void read_line(){
+  Wire.requestFrom(4, 11);                      //считываение 11 байт с датчика линии, который находится по адресу 4
+  for (byte i=0; Wire.available(); i++){        //пока данные приходят (!= 0)
+    raw_line[i] = Wire.read();                  //считать линию
+  }
+  error = 0;
+  for (byte i=0; i<8; i++){
+    line[i] = raw_line[i];
+    error += line[i] * line_weight[i];          //считывание ошибки
+  }
+}
+
+void print_line(){                              //вывод значений на датчике
+  for (byte i=0; i<8; i++){
+    Serial.print(line[i]);
+    Serial.print(" ");
+  }
+  Serial.println();
+}
+
+void loop() {
+  read_line();
+  print_line();
+  steering_drive();
+  delay(100);
+}
