@@ -25,11 +25,11 @@ void motor_setup(){
 }
 void steering_drive(){               //берет ошибку и подает на моторы
   error *= P_COOF;                   //делаем вклад ошибки по-меньше
-  if (error > 0){
+  if (error > 0){                    //поворот налево
     analogWrite(LEFT_PWM, SPEED);   
     analogWrite(RIGHT_PWM, constrain(SPEED + error, 0, SPEED));         // замедляет колесо, чтобы повернуть. Также не дает стать скорости меньше нуля или больше speed (тут тоже)
   }
-  else if (error < 0){
+  else if (error < 0){               //поворот направо
     analogWrite(LEFT_PWM, constrain(SPEED - error, 0, SPEED));           //плюс, т.к. error < 0   (тут еще надо подумать плюс или минус)
     analogWrite(RIGHT_PWM, SPEED);
   }
