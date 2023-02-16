@@ -27,7 +27,7 @@ void steering_drive(){               //берет ошибку и подает �
   error *= P_COOF;                   //делаем вклад ошибки по-меньше
   if (error > 0){
     analogWrite(LEFT_PWM, SPEED);   
-    analogWrite(RIGHT_PWM, constrain(SPEED + error, 0, SPEED));         // замедляет колесо, чтобы повернуть. Также не дает стать скорости меньше нуля или больше speed
+    analogWrite(RIGHT_PWM, constrain(SPEED - error, 0, SPEED));         // замедляет колесо, чтобы повернуть. Также не дает стать скорости меньше нуля или больше speed
   }
   else if (error < 0){
     analogWrite(LEFT_PWM, constrain(SPEED + error, 0, SPEED));           //плюс, т.к. error < 0
