@@ -1,0 +1,35 @@
+#include <DFRobot_BMI160.h>
+
+const int8_t i2c_addr =0x69; //адрес датчика
+
+DFRobot_BMI160 sensor; //объявление датчика
+
+int sensor_data[6];   //массив для данных с акселерометра и гироскопа (по три данных с каждым)
+
+void setup() {
+  Serial.begin(115200);  //частота считывания
+  sensor.I2cInit(i2c_addr); //инициализация датчика
+  while (!Serial);  //ждем, пока откроется Serial Monitor
+}
+
+void loop() {
+  sensor.getAccelGyroData(sensor_data);      //считывание значений ускорение и угловых скоростей (относительно всех осей) в массив
+
+  Serial.print("Угловая скорость относительно x:");
+  Serial.println(sensor_data[0]);
+  Serial.print("Угловая скорость относительно y:");
+  Serial.println(sensor_data[1]);
+  Serial.print("Угловая скорость относительно z:");
+  Serial.println(sensor_data[2]);
+  Serial.print("\n");
+  /*
+  Serial.print("Ускорение вдоль x:");
+  Serial.println(sensor_data[3]);
+  Serial.print("Ускорение вдоль y:");
+  Serial.println(sensor_data[4]);
+  Serial.print("Ускорение вдоль z:");
+  Serial.println(sensor_data[5]);
+  Serial.print("\n");
+  */
+  
+}
