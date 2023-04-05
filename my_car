@@ -16,8 +16,8 @@ unsigned int dist = 0;
 
 class Timer{
   public:
-    unsigned int time_begin;
-    unsigned int time_end;
+    long int time_begin;
+    long int time_end;
 
     Timer(unsigned int time_begin = 0, unsigned int time_end = 0): time_begin(time_begin), time_end(time_end){};
 };
