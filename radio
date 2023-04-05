@@ -1,57 +1,105 @@
-#define green 2
-#define blue 3
-#define red 4
-#define TR_pin A0
-#define E_pin A1
+#define PWM_M1 9
+#define PWM_M2 10
+#define DIR_M1 12
+#define DIR_M2 IO_E2
+#define red 8
+#define yellow 7
+#define green 6
+#define ON 1
+#define OFF 0
+#define trig 19
+#define echo 18
 
-void alarm(float);
-void radio(){
-  digitalWrite(TR_pin, 0);
-  delayMicroseconds(1);
-  digitalWrite(TR_pin, 1);
-  delayMicroseconds(10);
-  digitalWrite(TR_pin, 0);
-  while(!digitalRead(E_pin));
-//    Serial.println("Wait start...");
-  long int time_start = micros();
-  while(digitalRead(E_pin));
-//    Serial.println("Wait end...");
-  long int time_finish = micros();
-  float s = (float)(time_finish - time_start)/10000 * 170;     /sm
-  Serial.println(s);
-  delay(10);
-  alarm(s);
-}
-void alarm(float s){
+byte sonic_mode = 0;  //режим на дальномере (0 - дистанция измерена, 1 - тригер испускает волну, 2 - ждем, пока волна выйдет, 3 - ожидание сигнала на эхо)
 
-  digitalWrite(red,LOW);
-  digitalWrite(blue,LOW);
-  digitalWrite(green,LOW);
-  
-  if (s < 5){
-    digitalWrite(red, HIGH);
-  }
-  else if (s >= 5 && s < 10){
-    digitalWrite(blue, HIGH);
-  }
-  else {
-    digitalWrite(green, HIGH);
-  }
+float dist = 0;
 
-  
+class Timer {
+public:
+  long int time_begin = 0;
+  long int time_end = 0;
+
+  Timer(unsigned int time_begin = 0, unsigned int time_end = 0)
+    : time_begin(time_begin), time_end(time_end){};
+};
+
+Timer t_trig, t_echo;
+
+void debug(){
+  Serial.print("sonic_mode = ");
+  Serial.println(sonic_mode);
+  Serial.print("micros = ");
+  Serial.println(micros());
+  Serial.print("t_trig.time_begin = ");
+  Serial.println(t_trig.time_begin);
+  Serial.print("t_echo.time_begin = ");
+  Serial.println(t_echo.time_begin);
+  Serial.print("dist = ");
+  Serial.println(dist);
+  //delay(100);
 }
 
+void lump_switch(byte type, bool mode) {  //вкл\вкл светодиода
+  if (mode == ON && digitalRead(type) == LOW) {
+    digitalWrite(type, mode);
+  } else if (mode == OFF) {
+    digitalWrite(type, mode);
+  }
+}
+
+void distance() {                                   //измерение расстояния до объекта
+  //(триггер испускает волну в течение 10 микросек, как только волна вышла, на эхо появляется напряжение (само)[первая засечка времени], и, когда волна возвращается и попадает в эхо, напряжение на нем падает [вторая засечка времени])
+  if (sonic_mode == 0 && t_trig.time_begin == 0) {  //если дальномер не работает (режим == 0)
+    sonic_mode = 1;
+    debug();
+    digitalWrite(trig, HIGH);  //подаем напряжение на триггер и ждем 10 микросек
+    t_trig.time_begin = micros();
+    Serial.println(50);
+    debug();
+  } 
+  else if (sonic_mode == 1 && micros() - t_trig.time_begin >= 10) {  //если дальномер в первом режим и прошло 10 микросек
+    sonic_mode = 2;
+    debug();
+    digitalWrite(trig, LOW);  //убираем напряжение с триггера
+    t_trig.time_begin = 0;
+    Serial.println(56);
+    debug();
+  } 
+  else if (sonic_mode == 2 && digitalRead(echo) == HIGH) {  //на эхо появилось напряжение => волна полностью вышла
+    sonic_mode = 3;
+    debug();
+    t_echo.time_begin = micros();  //засекаем время для эхо, ждем пока волна вернется [первая засечка]
+    Serial.println(61);
+    debug();
+  } 
+  else if (sonic_mode == 3 && digitalRead(echo) == LOW) {
+    sonic_mode = 0;
+    debug();
+    Serial.print("Time: ");
+    Serial.print(micros() - t_echo.time_begin);
+    Serial.print(", Distance: ");
+    Serial.println(dist);
+    dist = (float)(micros() - t_echo.time_begin) * 0.0000001 * 330;  //330 - скрость звука (м/с), дистанция - в см
+    Serial.println(dist);
+    //delay(1000);
+    dist = 0;
+    Serial.println(73);
+    debug();
+    //delay(4000);
+  }
+}
 
 void setup() {
-  // put your setup code here, to run once:
-   pinMode(red, OUTPUT);
-   pinMode(green,OUTPUT);
-   pinMode(blue,OUTPUT);
-   pinMode(TR_pin,OUTPUT);
-   pinMode(E_pin,INPUT);
-   Serial.begin(9600);
+  pinMode(red, OUTPUT);
+  pinMode(yellow, OUTPUT);
+  pinMode(green, OUTPUT);
+  pinMode(trig, OUTPUT);
+  pinMode(echo, INPUT);
+
+  Serial.begin(9600);
+
 }
 
 void loop() {
- radio();
+  distance();
 }
