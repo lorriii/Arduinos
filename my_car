@@ -12,14 +12,14 @@
 
 byte sonic_mode = 0;    //режим на дальномере (0 - дистанция измерена, 1 - тригер испускает волну, 2 - ждем, пока волна выйдет, 3 - ожидание сигнала на эхо)
 
-unsigned int dist = 0;
+float dist = 0;
 
 class Timer{
   public:
     long int time_begin;
     long int time_end;
 
-    Timer(unsigned int time_begin = 0, unsigned int time_end = 0): time_begin(time_begin), time_end(time_end){};
+    Timer(long int time_begin = 0, long int time_end = 0): time_begin(time_begin), time_end(time_end){};
 };
 
 Timer t_trig, t_echo;
