@@ -55,7 +55,7 @@ void distance(){    //измерение расстояния до объект�
     Serial.print(micros() - t_echo.time_begin);
     Serial.print(", Distance: ");
     Serial.println(dist);
-    dist = (float)(micros() - t_echo.time_begin) * 0.0000001 * 330;    //330 - скрость звука (м/с), дистанция - в см
+    dist = (float)(micros() - t_echo.time_begin) * 0.0000001 * 165;    //330 - скрость звука (м/с), дистанция - в см, делим все на 2, т.к. звук шел до стенки и обратно
     Serial.println(dist);
     delay(1000);
   }
