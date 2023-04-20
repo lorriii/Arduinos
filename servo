@@ -2,23 +2,23 @@
 
 Servo myservo; 
 
-int pos = 0;    // variable to store the servo position
-int time_1 = millis();
+int pos = 0;  
+long int time_1 = millis();
 bool mode = true;
 
 void setup() {
-  myservo.attach(9);  // attaches the servo on pin 9 to the servo object
+  myservo.attach(9);
 }
 
 void loop() {
-  if (millis() - time_1 >= 20 && mode){
+  if (millis() - time_1 == 60 && mode){
     myservo.write(++pos); 
-    time_1 = millis();
     if (pos == 180) mode = false;
-  }
-  else if (millis() - time_1 >= 20 && !mode){
-    myservo.write(--pos); 
     time_1 = millis();
+  }
+  else if (millis() - time_1 == 60 && !mode){
+    myservo.write(--pos); 
     if (pos == 0) mode = true;
+    time_1 = millis();
   }
 }
