@@ -1,22 +1,23 @@
 #include <Servo.h>
 
-Servo myservo; 
+Servo myservo;  // create servo object to control a servo
+// twelve servo objects can be created on most boards
 
-int pos = 0;  
+int pos = 0;    // variable to store the servo position
 long int time_1 = millis();
 bool mode = true;
 
 void setup() {
-  myservo.attach(9);
+  myservo.attach(9);  // attaches the servo on pin 9 to the servo object
 }
 
 void loop() {
-  if (millis() - time_1 == 60 && mode){
+  if (millis() - time_1 >= 10 && mode){
     myservo.write(++pos); 
     if (pos == 180) mode = false;
     time_1 = millis();
   }
-  else if (millis() - time_1 == 60 && !mode){
+  else if (millis() - time_1 >= 10 && !mode){
     myservo.write(--pos); 
     if (pos == 0) mode = true;
     time_1 = millis();
