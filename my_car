@@ -53,8 +53,6 @@ void distance() {                                   //измерение рас�
 //То что после И похоже не нужно
     sonic_mode = 1;
     debug();
-    sonic_mode = 1;
-    debug();
     digitalWrite(trig, HIGH);  //подаем напряжение на триггер и ждем 10 микросек
     t_trig.time_begin = micros();
     Serial.println(50);
